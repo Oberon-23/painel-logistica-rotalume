@@ -1,6 +1,6 @@
 # Painel de Logística — Grupo Rotalume
 
-> Dashboard interativo de logística de uma empresa **fictícia** (Grupo Rotalume), em HTML/CSS/JS puro, sem backend. Acompanha entregas, armazém e custos de frete entre 3 centros de distribuição e 5 transportadoras.
+> Dashboard interativo de logística de uma empresa **fictícia** (Grupo Rotalume), em React + TypeScript, sem backend. Acompanha entregas, armazém e custos de frete entre 3 centros de distribuição e 5 transportadoras.
 
 ![Visão geral](docs/img/logistica_visao_geral.png)
 
@@ -17,7 +17,11 @@
 - **Custo de frete por kg + produtividade por CD**: combina visão financeira com visão operacional, para não otimizar custo escondendo queda de produtividade (ou vice-versa).
 - **Transportadora "barata mas não confiável" embutida nos dados**: existe de propósito um trade-off custo × confiabilidade entre as 5 transportadoras, para o painel revelar uma decisão real de negócio, não só números soltos.
 - **Evento de migração de WMS em um dos CDs**: simula uma queda temporária de produtividade por causa de uma troca de sistema, testando se os indicadores separam "ruído pontual" de "tendência real".
-- **Arquivo único, sem build**: todo o HTML/CSS/JS está em um só arquivo (`index.html`), com dados sintéticos gerados no próprio navegador (semente fixa, reprodutível) e gráficos via Chart.js por CDN. Isso permite publicar em qualquer hospedagem estática — Vercel, GitHub Pages, Netlify — sem passo de build.
+- **React + TypeScript com dados gerados no navegador**: os dados sintéticos são criados no próprio navegador (semente fixa, reprodutível) e a aplicação é publicada como site estático, sem backend. Cada tela abre com uma manchete que diz o resultado em uma frase, antes dos gráficos.
+
+![Armazém](docs/img/logistica_armazem.png)
+
+![Custos de frete](docs/img/logistica_custos.png)
 
 ## Dados
 
@@ -25,17 +29,17 @@ Todos os dados são fictícios, gerados no navegador ao carregar a página (sem 
 
 ## Deploy
 
-Projeto 100% estático — basta apontar a hospedagem para a raiz do repositório.
+Aplicação estática feita com Vite. Na Vercel, basta importar o repositório: o framework é detectado sozinho (build `npm run build`, saída `dist/`). O `vercel.json` redireciona as rotas para o `index.html`, então links diretos como `/entregas` funcionam.
 
-**Vercel:**
+**Localmente:**
 ```bash
-npm i -g vercel   # se ainda não tiver
-vercel --prod
+npm install
+npm run dev       # desenvolvimento
+npm run build     # gera dist/
 ```
-Ou: importar o repositório direto em [vercel.com/new](https://vercel.com/new) — nenhuma configuração de build é necessária (é um `index.html` puro).
 
-**Localmente:** abra `index.html` no navegador, ou sirva com qualquer servidor estático (`npx serve .`).
+A versão anterior, em HTML puro com Chart.js, está preservada em `legado.html`.
 
 ## Stack
 
-HTML5, CSS3 (custom properties para tema claro/escuro), JavaScript (ES6+), [Chart.js 4.4.1](https://www.chartjs.org/).
+React 19 + TypeScript, Vite, React Router, [Recharts](https://recharts.org/) e ícones Lucide. O tema claro/escuro usa variáveis CSS e os gráficos leem as mesmas cores, então mudam junto com o tema. Os filtros ficam salvos no navegador. A identidade visual é compartilhada com os outros painéis da Rotalume.
