@@ -48,12 +48,12 @@ export default function Armazem() {
       <Kpis itens={[
         { label: 'Produtividade', tip: 'Linhas de pedido separadas por hora trabalhada. Uma linha é um item do pedido, em qualquer quantidade.', value: fN(a.prod, 0), unit: ' linhas/h', target: 'Meta ≥ 95', status: statusOf(a.prod, META.prod, true, 0.05), delta: <Delta atual={a.prod} anterior={b?.prod} sobeBom fmt={(x) => nf(1).format(x)} />, spark: sparkProd },
         { label: 'Erros de separação', tip: 'Itens errados ou faltando encontrados na conferência, a cada mil linhas separadas.', value: fN(a.errK, 1), unit: ' ‰', target: 'Meta ≤ 3 por mil', status: statusOf(a.errK, META.erros, false, 0.15), delta: <Delta atual={a.errK} anterior={b?.errK} sobeBom={false} fmt={(x) => nf(1).format(x)} />, spark: sparkErr },
-        { label: 'Ocupação', tip: 'Parte das posições de estoque em uso. Acima de 90% fica difícil guardar e separar com agilidade.', value: fN(occ * 100, 1), unit: '%', target: 'Meta ≤ 90%', status: statusOf(occ, META.occ, false, 0.03), spark: MONTHS.map((_, i) => mean(cds.map((ci) => OCC[ci][i]))) },
-        { label: 'Acuracidade do estoque', tip: 'Posições em que o estoque físico bateu com o sistema no inventário cíclico.', value: fN(acc * 100, 1), unit: '%', target: 'Meta ≥ 98,5%', status: statusOf(acc, META.acc, true, 0.01), spark: MONTHS.map((_, i) => mean(cds.map((ci) => ACC[ci][i]))) },
+        { label: 'Ocupação', tip: 'Parte das posições de estoque em uso. Acima de 90% fica difícil guardar e separar com agilidade.', value: fN(occ * 100, 1), unit: '%', target: f.cd === 'all' ? 'Meta ≤ 90% · média dos 3 CDs' : 'Meta ≤ 90%', status: statusOf(occ, META.occ, false, 0.03), spark: MONTHS.map((_, i) => mean(cds.map((ci) => OCC[ci][i]))) },
+        { label: 'Acuracidade do estoque', tip: 'Posições em que o estoque físico bateu com o sistema no inventário cíclico.', value: fN(acc * 100, 1), unit: '%', target: f.cd === 'all' ? 'Meta ≥ 98,5% · média dos 3 CDs' : 'Meta ≥ 98,5%', status: statusOf(acc, META.acc, true, 0.01), spark: MONTHS.map((_, i) => mean(cds.map((ci) => ACC[ci][i]))) },
       ]} />
 
       <div className="grade g-7-5">
-        <Card titulo="Quantas linhas cada CD separa por hora?" sub="Produtividade mensal. A linha vertical marca a troca do WMS em Campinas.">
+        <Card titulo="Quantas linhas cada CD separa por hora?" sub={cds.includes(1) ? 'Produtividade mensal. A linha vertical marca a troca do WMS em Campinas.' : 'Produtividade mensal.'}>
           <Legenda itens={[...cds.map((ci) => ({ label: CDS[ci].nome, cor: cor.serie[ci], tipo: 'linha' as const })), { label: 'Meta 95', tipo: 'tracejado' as const }]} />
           <Grafico rotulo="Produtividade mensal por CD" altura={290}>
             <LineChart data={porMes} margin={margem}>

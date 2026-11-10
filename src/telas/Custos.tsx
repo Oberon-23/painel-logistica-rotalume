@@ -1,4 +1,4 @@
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ReferenceLine, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis, LabelList } from 'recharts';
+import { Line, LineChart, Bar, BarChart, CartesianGrid, Cell, ReferenceLine, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis, LabelList } from 'recharts';
 import { useFiltro } from '../App';
 import { agg, byMonth, CAR, DIESEL, META, REG, sel, selAll } from '../dados';
 import { fBRL, fN, fP, nf, statusOf } from '../kit/formato';
@@ -51,15 +51,15 @@ export default function Custos() {
       <div className="grade g2">
         <Card titulo="Quanto custa levar 1 kg?" sub="Frete por quilo transportado, mês a mês. A linha marca o aumento do diesel em junho.">
           <Grafico rotulo="Frete por kg por mês" altura={270}>
-            <AreaChart data={serieKg} margin={margem}>
+            <LineChart data={serieKg} margin={margem}>
               <CartesianGrid {...grade} />
               {faixasForaDoPeriodo(from, to)}
               <XAxis dataKey="mes" {...eixoX} />
               <YAxis {...eixoY} width={64} domain={[kgT[0], kgT[kgT.length - 1]]} ticks={kgT} tickFormatter={(v) => `R$ ${nf(2).format(v)}`} />
               <ReferenceLine x={MONTHS[7].label} stroke={cor.warn} strokeDasharray="2 3" label={{ value: 'Diesel +9%', position: 'insideTopRight', fill: cor.warn }} />
               <Tooltip content={tt((v) => `R$ ${nf(2).format(v)} por kg`)} />
-              <Area dataKey="kg" name="Frete por kg" stroke={cor.accent} strokeWidth={2.6} fill={cor.accent} fillOpacity={0.12} dot={{ r: 3.5, fill: cor.accent }} isAnimationActive={false} />
-            </AreaChart>
+              <Line dataKey="kg" name="Frete por kg" stroke={cor.accent} strokeWidth={2.6} dot={{ r: 3.5, fill: cor.accent }} isAnimationActive={false} />
+            </LineChart>
           </Grafico>
         </Card>
         <Card titulo="Barato nem sempre compensa" sub="Cada bolha é uma transportadora: mais à direita, mais cara; mais acima, mais pontual. O tamanho é o volume de entregas.">

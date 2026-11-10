@@ -1,10 +1,10 @@
-import { Bar, BarChart, CartesianGrid, Cell, ReferenceLine, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, ReferenceLine, Tooltip, XAxis, YAxis } from 'recharts';
 import { useFiltro } from '../App';
 import { agg, CAR, META, MOTIVOS_DO_CD, REG, sel } from '../dados';
 import { fN, fP, fPP, mean, nf, statusOf, sum } from '../kit/formato';
 import { periodLabel, prevRange } from '../kit/meses';
 import { Card, Delta, Kpis, Legenda, Manchete, Pill } from '../kit/ui';
-import { CaixaTt, eixoX, eixoY, grade, Grafico, margem, passos, tt, useCores } from '../kit/graficos';
+import { CaixaTt, eixoX, eixoY, grade, Grafico, margem, tt, useCores } from '../kit/graficos';
 
 export default function Entregas() {
   const f = useFiltro();
@@ -17,7 +17,6 @@ export default function Entregas() {
   const worst = [...cars].sort((x, y) => x.a.otif - y.a.otif)[0], best = [...cars].sort((x, y) => y.a.otif - x.a.otif)[0];
 
   const cs = [...cars].sort((x, y) => y.a.otif - x.a.otif).map((x) => ({ nome: x.c.nome.replace('Transportadora ', ''), otif: +(x.a.otif * 100).toFixed(1), n: x.a.n, dmg: x.a.dmg }));
-  const xMin = Math.max(0, Math.floor(Math.min(...cs.map((x) => x.otif)) / 5) * 5 - 5);
 
   const why: Record<string, number> = {};
   rows.forEach((s) => { if (!s.onTime) why[s.motivo!] = (why[s.motivo!] || 0) + 1; if (s.incMot) why[s.incMot] = (why[s.incMot] || 0) + 1; });
@@ -48,9 +47,9 @@ export default function Entregas() {
       <div className="grade g2">
         <Card titulo="Qual transportadora entrega melhor?" sub="OTIF de cada parceiro. Verde na meta, amarelo perto, vermelho abaixo de 90%.">
           <Grafico semDados={!cs.length} rotulo="OTIF por transportadora" altura={260}>
-            <BarChart data={cs} layout="vertical" margin={{ top: 16, right: 30, bottom: 0, left: 8 }}>
+            <BarChart data={cs} layout="vertical" margin={{ top: 16, right: 24, bottom: 0, left: 8 }}>
               <CartesianGrid horizontal={false} />
-              <XAxis type="number" domain={[xMin, 100]} ticks={passos(xMin, 100, 5)} tickFormatter={(v) => `${v}%`} tickLine={false} axisLine={false} />
+              <XAxis type="number" domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(v) => `${v}%`} tickLine={false} axisLine={false} />
               <YAxis type="category" dataKey="nome" {...eixoY} width={96} tick={{ fontWeight: 600 }} />
               <ReferenceLine x={95} stroke={cor['ink-2']} strokeDasharray="5 4" label={{ value: 'Meta', position: 'top' }} />
               <Tooltip cursor={{ fill: cor['accent-soft'], opacity: 0.4 }} content={({ active, payload }) => {
@@ -60,6 +59,7 @@ export default function Entregas() {
               }} />
               <Bar dataKey="otif" radius={[0, 5, 5, 0]} maxBarSize={26} isAnimationActive={false}>
                 {cs.map((x) => <Cell key={x.nome} fill={x.otif < 95 ? (x.otif < 90 ? cor.bad : cor.warn) : cor.good} />)}
+                <LabelList dataKey="otif" position="insideRight" formatter={(v: unknown) => `${nf(1).format(Number(v))}%`} fontSize={12} fontWeight={700} fill={cor.surface} />
               </Bar>
             </BarChart>
           </Grafico>
