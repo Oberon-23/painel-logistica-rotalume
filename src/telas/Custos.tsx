@@ -1,4 +1,4 @@
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ReferenceLine, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from 'recharts';
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ReferenceLine, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis, LabelList } from 'recharts';
 import { useFiltro } from '../App';
 import { agg, byMonth, CAR, DIESEL, META, REG, sel, selAll } from '../dados';
 import { fBRL, fN, fP, nf, statusOf } from '../kit/formato';
@@ -20,7 +20,13 @@ export default function Custos() {
 
   const serieKg = MONTHS.map((mm, i) => ({ mes: mm.label, i, kg: +mAll[i].kg.toFixed(3) }));
   const cars = CAR.map((c, i) => ({ c, i, a: agg(rows.filter((s) => s.ca === i)) })).filter((x) => x.a.n >= 20)
-    .map((x) => ({ nome: x.c.nome.replace('Transportadora ', ''), i: x.i, kg: +x.a.kg.toFixed(3), otif: +(x.a.otif * 100).toFixed(1), n: x.a.n }));
+    .map((x) => ({ nome: x.c.nome.replace('Transportadora ', ''), i: x.i, kg: +x.a.kg.toFixed(3), otif: +(x.a.otif * 100).toFixed(1), n: x.a.n, custoOk: x.a.frete / Math.max(1, x.a.otif * x.a.n), dy: 0 }));
+  // afasta os rótulos de transportadoras muito próximas no gráfico
+  [...cars].sort((a, b) => b.otif - a.otif).forEach((x, k, arr) => {
+    const prev = arr[k - 1];
+    if (prev && Math.abs(prev.kg - x.kg) < 0.06 && prev.otif + prev.dy / 9 - x.otif < 2.2) x.dy = prev.dy + 14 - (prev.otif - x.otif) * 9;
+  });
+  const porCustoOk = [...cars].sort((a, b) => a.custoOk - b.custoOk);
   const rs = [...regs].sort((x, y) => y.a.fretePct - x.a.fretePct).map((x) => ({ regiao: x.r, pct: +(x.a.fretePct * 100).toFixed(2), kg: x.a.kg }));
   const kgs = serieKg.map((s) => s.kg);
   const kgT = passos(Math.min(...kgs) - 0.02, Math.max(...kgs) + 0.02, 0.05);
@@ -58,13 +64,13 @@ export default function Custos() {
         </Card>
         <Card titulo="Barato nem sempre compensa" sub="Cada bolha é uma transportadora: mais à direita, mais cara; mais acima, mais pontual. O tamanho é o volume de entregas.">
           <Legenda itens={[...cars.map((x) => ({ label: x.nome, cor: cor.serie[x.i] })), { label: 'Meta OTIF 95%', tipo: 'tracejado' as const }]} />
-          <Grafico rotulo="Custo por kg e OTIF por transportadora" altura={270}>
-            <ScatterChart margin={{ top: 16, right: 24, bottom: 14, left: 0 }}>
+          <Grafico semDados={!cars.length} rotulo="Custo por kg e OTIF por transportadora" altura={280}>
+            <ScatterChart margin={{ top: 16, right: 70, bottom: 14, left: 0 }}>
               <CartesianGrid strokeDasharray="0" />
               <XAxis type="number" dataKey="kg" name="Frete por kg" domain={[cxT[0], cxT[cxT.length - 1]]} ticks={cxT} tickFormatter={(v) => nf(2).format(v)} {...eixoX}
                 label={{ value: 'Frete por kg (R$)', position: 'insideBottom', offset: -10 }} />
               <YAxis type="number" dataKey="otif" name="OTIF" domain={[cyMin, 100]} ticks={passos(cyMin, 100, 5)} tickFormatter={(v) => `${v}%`} {...eixoY} />
-              <ZAxis type="number" dataKey="n" range={[160, 1100]} />
+              <ZAxis type="number" dataKey="n" range={[60, 380]} />
               <ReferenceLine y={95} stroke={cor['ink-2']} strokeDasharray="5 4" />
               <Tooltip cursor={false} content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
@@ -72,16 +78,21 @@ export default function Custos() {
                 return <CaixaTt titulo={x.nome} linhas={[{ nome: 'Frete por kg', valor: `R$ ${nf(2).format(x.kg)}` }, { nome: 'OTIF', valor: `${nf(1).format(x.otif)}%` }, { nome: 'Entregas', valor: fN(x.n) }]} />;
               }} />
               <Scatter data={cars} isAnimationActive={false}>
-                {cars.map((x) => <Cell key={x.nome} fill={cor.serie[x.i]} fillOpacity={0.85} stroke={cor.surface} strokeWidth={2} />)}
+                {cars.map((x) => <Cell key={x.nome} fill={cor.serie[x.i]} fillOpacity={0.9} stroke={cor.surface} strokeWidth={1.5} />)}
+                <LabelList dataKey="nome" content={(p) => {
+                  const x = Number(p.x), y = Number(p.y), w = Number(p.width ?? 0), d = cars[Number(p.index)];
+                  return <text x={x + w + 6} y={y + w / 2 + 4 + (d?.dy ?? 0)} fontSize={12} fontWeight={600} fill={cor['ink-2']} className="halo">{String(p.value)}</text>;
+                }} />
               </Scatter>
             </ScatterChart>
           </Grafico>
+          <p className="nota-grafico">Custo por entrega que chegou no prazo e completa: {porCustoOk.map((x, k) => <span key={x.nome}>{k ? ' · ' : ''}<b>{x.nome}</b> R$ {nf(0).format(x.custoOk)}</span>)}. A mais barata por kg nem sempre é a mais barata por entrega bem-feita.</p>
         </Card>
       </div>
 
       <Card titulo="Frete como % do valor da mercadoria, por região" sub="Em destaque, as regiões acima da meta de 3,5%.">
         <Legenda itens={[{ label: 'Dentro da meta', cor: cor.accent }, { label: 'Acima da meta', cor: cor.warn }, { label: 'Meta 3,5%', tipo: 'tracejado' }]} />
-        <Grafico rotulo="Frete sobre o valor por região" altura={230}>
+        <Grafico semDados={!rs.length} rotulo="Frete sobre o valor por região" altura={230}>
           <BarChart data={rs} margin={margem}>
             <CartesianGrid {...grade} />
             <XAxis dataKey="regiao" {...eixoX} interval={0} />

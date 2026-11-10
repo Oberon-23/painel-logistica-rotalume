@@ -1,13 +1,14 @@
+import { lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { BookOpen, House, Truck, Warehouse, Wallet } from 'lucide-react';
 import { FiltrosProvider, useFiltros, type DefFiltro } from './kit/filtros';
 import { Moldura, type Visao } from './kit/ui';
 import { CDS, REG, type Filtro } from './dados';
-import Resumo from './telas/Resumo';
-import Entregas from './telas/Entregas';
-import Armazem from './telas/Armazem';
-import Custos from './telas/Custos';
-import Sobre from './telas/Sobre';
+const Resumo = lazy(() => import('./telas/Resumo'));
+const Entregas = lazy(() => import('./telas/Entregas'));
+const Armazem = lazy(() => import('./telas/Armazem'));
+const Custos = lazy(() => import('./telas/Custos'));
+const Sobre = lazy(() => import('./telas/Sobre'));
 
 const FILTROS: DefFiltro[] = [
   { id: 'cd', label: 'Centro de distribuição', options: [['all', 'Todos'], ...CDS.map((c, i) => [String(i), c.nome] as [string, string])] },

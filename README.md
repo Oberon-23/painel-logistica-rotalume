@@ -1,5 +1,7 @@
 # Painel de Logística — Grupo Rotalume
 
+[![CI](https://github.com/Oberon-23/painel-logistica-rotalume/actions/workflows/ci.yml/badge.svg)](https://github.com/Oberon-23/painel-logistica-rotalume/actions/workflows/ci.yml)
+
 > Dashboard interativo de logística de uma empresa **fictícia** (Grupo Rotalume), em React + TypeScript, sem backend. Acompanha entregas, armazém e custos de frete entre 3 centros de distribuição e 5 transportadoras.
 
 ![Visão geral](docs/img/logistica_visao_geral.png)
@@ -36,6 +38,7 @@ Aplicação estática feita com Vite. Na Vercel, basta importar o repositório: 
 npm install
 npm run dev       # desenvolvimento
 npm run build     # gera dist/
+npm test          # testes dos cálculos
 ```
 
 A versão anterior, em HTML puro com Chart.js, está preservada em `legado.html`.

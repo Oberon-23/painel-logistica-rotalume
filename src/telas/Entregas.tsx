@@ -47,7 +47,7 @@ export default function Entregas() {
 
       <div className="grade g2">
         <Card titulo="Qual transportadora entrega melhor?" sub="OTIF de cada parceiro. Verde na meta, amarelo perto, vermelho abaixo de 90%.">
-          <Grafico rotulo="OTIF por transportadora" altura={260}>
+          <Grafico semDados={!cs.length} rotulo="OTIF por transportadora" altura={260}>
             <BarChart data={cs} layout="vertical" margin={{ top: 16, right: 30, bottom: 0, left: 8 }}>
               <CartesianGrid horizontal={false} />
               <XAxis type="number" domain={[xMin, 100]} ticks={passos(xMin, 100, 5)} tickFormatter={(v) => `${v}%`} tickLine={false} axisLine={false} />
@@ -66,7 +66,7 @@ export default function Entregas() {
         </Card>
         <Card titulo="Por que as entregas falham?" sub="Atrasos e entregas incompletas por motivo. Em laranja, o que nasce dentro do CD.">
           <Legenda itens={[{ label: 'Transporte', cor: cor.c1 }, { label: 'Dentro do CD', cor: cor.c2 }]} />
-          <Grafico rotulo="Motivos de falha" altura={Math.max(240, ws.length * 30 + 20)}>
+          <Grafico semDados={!ws.length} vazio="Nenhuma falha de entrega neste recorte." rotulo="Motivos de falha" altura={Math.max(240, ws.length * 30 + 20)}>
             <BarChart data={ws} layout="vertical" margin={{ top: 4, right: 24, bottom: 0, left: 8 }}>
               <CartesianGrid horizontal={false} />
               <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} />
@@ -83,7 +83,7 @@ export default function Entregas() {
       <div className="grade g-5-7">
         <Card titulo="Prazo prometido × prazo real" sub="Média de dias por região de destino.">
           <Legenda itens={[{ label: 'Prometido', cor: cor['seq-3'] }, { label: 'Real', cor: cor['seq-6'] }]} />
-          <Grafico rotulo="Prazo prometido e real por região" altura={260}>
+          <Grafico semDados={!rg.length} rotulo="Prazo prometido e real por região" altura={260}>
             <BarChart data={rg} margin={margem}>
               <CartesianGrid {...grade} />
               <XAxis dataKey="regiao" {...eixoX} interval={0} />
