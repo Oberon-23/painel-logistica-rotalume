@@ -4,7 +4,15 @@
 
 > Dashboard interativo de logística de uma empresa **fictícia** (Grupo Rotalume), em React + TypeScript, sem backend. Acompanha entregas, armazém e custos de frete entre 3 centros de distribuição e 5 transportadoras.
 
-![Visão geral](docs/img/logistica_visao_geral.png)
+**[Abrir o painel →](https://painel-logistica-rotalume.vercel.app)**
+
+## Em 30 segundos
+
+- **Problema:** "atraso médio" esconde a entrega que chega no dia mas incompleta, e a transportadora mais barata nem sempre compensa.
+- **O que fiz:** um painel de OTIF (no prazo **e** completo) com 3 centros de distribuição e 5 transportadoras, custo de frete por kg e produtividade do armazém. Cada tela abre com uma frase que diz o resultado antes dos gráficos.
+- **O que ele mostra:** OTIF de 88,3% em 12 meses, abaixo da meta de 95%, com o Nordeste e a Transportadora Gama puxando o número para baixo.
+
+![Demonstração: visão geral, filtro por região e a tela de entregas](docs/img/demo.gif)
 
 ## O que o painel responde
 
